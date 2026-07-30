@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>生成分享卡片 · 人类基准测试</title>
+<style>
+  body { font-family: -apple-system, "PingFang SC", sans-serif; text-align: center; padding: 40px; background: #1a1a2e; color: #eaeaea; }
+  canvas { border-radius: 12px; box-shadow: 0 4px 24px rgba(0,0,0,0.5); max-width: 90vw; }
+  button { margin-top: 16px; padding: 14px 40px; font-size: 17px; background: #e94560; color: white; border: none; border-radius: 14px; cursor: pointer; font-weight: 600; }
+  button:hover { opacity: 0.85; }
+  button:disabled { opacity: 0.5; cursor: not-allowed; }
+  p { color: #a0a0b0; margin-top: 12px; font-size: 14px; }
+  h2 { color: #eaeaea; }
+</style>
+</head>
+<body>
+<h2>人类基准测试 · 分享卡片</h2>
+<canvas id="c"></canvas>
+<p id="status-text">正在加载二维码…</p>
+<button id="dl-btn" onclick="downloadPNG()" disabled>下载 PNG</button>
+<script>
+const W = 1200, H = 1600;
+const canvas = document.getElementById('c');
+canvas.width = W; canvas.height = H;
+const ctx = canvas.getContext('2d');
+
+// 深色背景
+const bgGrad = ctx.createLinearGradient(0, 0, 0, H);
+bgGrad.addColorStop(0, '#1a1a2e');
+bgGrad.addColorStop(1, '#16213e');
+ctx.fillStyle = bgGrad; ctx.fillRect(0, 0, W, H);
+
+// 装饰圆
+ctx.globalAlpha = 0.08;
+[
+  { x: 200, y: 300, r: 300, c: '#e94560' },
+  { x: 1050, y: 350, r: 220, c: '#0f3460' },
+  { x: 150, y: 1300, r: 200, c: '#4ecca3' },
+  { x: 950, y: 1250, r: 280, c: '#e94560' },
+].forEach(d => {
+  ctx.fillStyle = d.c;
+  ctx.beginPath(); ctx.arc(d.x, d.y, d.r, 0, Math.PI * 2); ctx.fill();
+});
+ctx.globalAlpha = 1;
+
+// 标题
+ctx.textAlign = 'center';
+ctx.fillStyle = '#eaeaea';
+ctx.font = "bold 72px -apple-system, 'PingFang SC', sans-serif";
+ctx.fillText('人类基准测试', W / 2, 200);
+
+ctx.fillStyle = '#6a6a7a';
+ctx.font = "32px -apple-system, 'PingFang SC', sans-serif";
+ctx.fillText('测测你的认知能力极限', W / 2, 260);
+
+// 测试列表卡片
+const tests = [
+  { emoji: '⚡', name: '反应速度', desc: '屏幕变绿时尽快点击' },
+  { emoji: '🔢', name: '数字记忆', desc: '记住逐渐变长的数字串' },
+  { emoji: '📝', name: '词汇记忆', desc: '判断词汇是否出现过' },
+  { emoji: '👁️', name: '视觉记忆', desc: '记住亮起格子的位置' },
+  { emoji: '🧠', name: '序列记忆', desc: '记住并复现方块亮起顺序' },
+  { emoji: '⌨️', name: '打字速度', desc: '60 秒高速输入挑战' },
+  { emoji: '🎯', name: '瞄准训练', desc: '尽快点击随机目标' },
+];
+
+const listY = 350;
+tests.forEach((t, i) => {
+  const col = i < 4 ? 0 : 1;
+  const row = i < 4 ? i : i - 4;
+  const x = col === 0 ? 100 : 620;
+  const y = listY + row * 150;
+  const w = 480, h = 130;
+
+  ctx.fillStyle = 'rgba(255,255,255,0.04)';
+  ctx.strokeStyle = 'rgba(255,255,255,0.08)'; ctx.lineWidth = 1;
+  rr(x, y, w, h, 16); ctx.fill(); ctx.stroke();
+
+  ctx.font = "40px -apple-system, 'PingFang SC', sans-serif";
+  ctx.textAlign = 'left';
+  ctx.fillText(t.emoji, x + 24, y + h / 2 + 14);
+
+  ctx.fillStyle = '#eaeaea';
+  ctx.font = "600 28px -apple-system, 'PingFang SC', sans-serif";
+  ctx.fillText(t.name, x + 80, y + 48);
+
+  ctx.fillStyle = '#6a6a7a';
+  ctx.font = "22px -apple-system, 'PingFang SC', sans-serif";
+  ctx.fillText(t.desc, x + 80, y + 84);
+});
+
+// QR 码加载
+const qrImg = new Image();
+qrImg.crossOrigin = 'anonymous';
+qrImg.onload = function() {
+  const qs = 280;
+  ctx.drawImage(qrImg, W / 2 - qs / 2, H - 420, qs, qs);
+
+  ctx.fillStyle = '#6a6a7a';
+  ctx.font = "italic 26px -apple-system, 'PingFang SC', sans-serif";
+  ctx.textAlign = 'center';
+  ctx.fillText('扫码体验 · human-bench.pages.dev', W / 2, H - 100);
+
+  document.getElementById('dl-btn').disabled = false;
+  document.getElementById('status-text').textContent = '点击下载 PNG，上传为 og:image';
+};
+qrImg.onerror = function() {
+  document.getElementById('dl-btn').disabled = true;
+  document.getElementById('status-text').textContent = 'QR 码加载失败，请检查网络';
+};
+qrImg.src = 'https://api.qrserver.com/v1/create-qr-code/?size=280x280&margin=6&data=' + encodeURIComponent('https://human-bench.pages.dev/');
+
+function rr(x, y, w, h, r) {
+  ctx.beginPath();
+  ctx.moveTo(x + r, y); ctx.lineTo(x + w - r, y);
+  ctx.arcTo(x + w, y, x + w, y + r, r);
+  ctx.lineTo(x + w, y + h - r);
+  ctx.arcTo(x + w, y + h, x + w - r, y + h, r);
+  ctx.lineTo(x + r, y + h);
+  ctx.arcTo(x, y + h, x, y + h - r, r);
+  ctx.lineTo(x, y + r); ctx.arcTo(x, y, x + r, y, r);
+  ctx.closePath();
+}
+
+function downloadPNG() {
+  const a = document.createElement('a');
+  a.download = 'human-bench-share-card.png';
+  a.href = canvas.toDataURL('image/png');
+  a.click();
+}
+</script>
+</body>
+</html>

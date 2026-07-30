@@ -1,0 +1,1510 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta property="og:title" content="人类基准测试">
+<meta property="og:description" content="多项认知能力测试合集，测测你的反应速度、记忆力、打字速度">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://human-bench.pages.dev/">
+<meta property="og:image" content="https://human-bench.pages.dev/share-card.png">
+<title>人类基准测试</title>
+<style>
+/* === CSS 变量：深色科技风主题 === */
+:root {
+  --bg: #1a1a2e;
+  --card: #16213e;
+  --card-hover: #1c2e54;
+  --primary: #0f3460;
+  --accent: #e94560;
+  --accent-light: #ff6b81;
+  --success: #4ecca3;
+  --warning: #ffd369;
+  --text: #eaeaea;
+  --text-secondary: #a0a0b0;
+  --text-muted: #6a6a7a;
+  --radius: 14px;
+  --shadow: 0 4px 24px rgba(0,0,0,0.3);
+}
+
+/* === 基础重置 === */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html, body { height: 100%; }
+
+body {
+  font-family: -apple-system, "PingFang SC", "Microsoft YaHei", "Hiragino Sans GB", sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  -webkit-tap-highlight-color: transparent;
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
+  touch-action: manipulation;
+}
+
+/* === 主容器 === */
+#app {
+  width: 100%;
+  max-width: 480px;
+  margin: 0 auto;
+  padding: 20px 16px 40px;
+  min-height: 100vh;
+}
+
+/* === 标题 === */
+.app-title {
+  text-align: center;
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 4px;
+  letter-spacing: 2px;
+}
+.app-subtitle {
+  text-align: center;
+  font-size: 13px;
+  color: var(--text-muted);
+  margin-bottom: 24px;
+}
+
+/* === 菜单网格 === */
+#menu {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.test-card {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  background: var(--card);
+  border-radius: var(--radius);
+  padding: 16px;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.15s;
+  box-shadow: var(--shadow);
+  border: 1px solid rgba(255,255,255,0.04);
+}
+.test-card:active {
+  background: var(--card-hover);
+  transform: scale(0.98);
+}
+
+.test-card-emoji {
+  font-size: 32px;
+  flex-shrink: 0;
+  width: 48px;
+  text-align: center;
+}
+
+.test-card-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.test-card-name {
+  font-size: 17px;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 2px;
+}
+
+.test-card-desc {
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+.test-card-best {
+  font-size: 11px;
+  color: var(--accent);
+  margin-top: 2px;
+  font-weight: 500;
+}
+
+.test-card-arrow {
+  color: var(--text-muted);
+  font-size: 20px;
+  flex-shrink: 0;
+}
+
+/* === 测试容器 === */
+#test-container {
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  min-height: 70vh;
+}
+
+.test-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  margin-bottom: 20px;
+}
+
+.test-title {
+  font-size: 20px;
+  font-weight: 700;
+}
+
+.btn-back {
+  background: var(--card);
+  border: 1px solid rgba(255,255,255,0.1);
+  color: var(--text-secondary);
+  padding: 8px 16px;
+  border-radius: 10px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.btn-back:active { background: var(--card-hover); }
+
+.test-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+}
+
+/* === 测试说明页 === */
+.test-intro {
+  text-align: center;
+  max-width: 320px;
+}
+.test-intro-desc {
+  font-size: 15px;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  margin-bottom: 24px;
+}
+.test-intro-best {
+  font-size: 13px;
+  color: var(--accent);
+  margin-bottom: 20px;
+}
+
+/* === 按钮 === */
+.btn-primary {
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  padding: 14px 40px;
+  border-radius: 12px;
+  font-size: 17px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.1s;
+  min-width: 160px;
+}
+.btn-primary:active {
+  background: var(--accent-light);
+  transform: scale(0.97);
+}
+
+.btn-secondary {
+  background: var(--card);
+  color: var(--text);
+  border: 1px solid rgba(255,255,255,0.12);
+  padding: 12px 32px;
+  border-radius: 12px;
+  font-size: 15px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.btn-secondary:active { background: var(--card-hover); }
+
+/* === 通用测试界面组件 === */
+.test-area {
+  width: 100%;
+  max-width: 360px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+}
+
+.test-hint {
+  font-size: 14px;
+  color: var(--text-secondary);
+  text-align: center;
+}
+
+.test-display {
+  font-size: 48px;
+  font-weight: 700;
+  color: var(--text);
+  text-align: center;
+  letter-spacing: 4px;
+  min-height: 64px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* === 反应速度：大色块 === */
+.reaction-stage {
+  width: 100%;
+  max-width: 340px;
+  aspect-ratio: 1;
+  border-radius: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background 0.15s;
+  font-size: 20px;
+  font-weight: 600;
+}
+.reaction-wait { background: #c41e3a; color: #fff; }   /* 红色等待 */
+.reaction-go { background: #4ecca3; color: #1a1a2e; }   /* 绿色点击 */
+.reaction-result { background: var(--card); color: var(--text); cursor: default; }
+
+/* === 视觉记忆 / 序列记忆：网格 === */
+.memory-grid {
+  display: grid;
+  gap: 4px;
+  width: 100%;
+  max-width: 340px;
+  aspect-ratio: 1;
+}
+
+.memory-cell {
+  background: var(--primary);
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.1s;
+}
+.memory-cell.lit { background: var(--accent); }
+.memory-cell.correct { background: var(--success); }
+.memory-cell.wrong { background: var(--accent); }
+.memory-cell.user-lit { background: var(--accent); }
+
+/* === 打字速度 === */
+.typing-text-display {
+  width: 100%;
+  max-width: 360px;
+  background: var(--card);
+  border-radius: var(--radius);
+  padding: 16px;
+  font-size: 16px;
+  line-height: 1.8;
+  color: var(--text-muted);
+  word-wrap: break-word;
+  max-height: 140px;
+  overflow-y: auto;
+}
+.typing-text-display .correct { color: var(--success); }
+.typing-text-display .incorrect { color: var(--accent); text-decoration: underline; }
+.typing-text-display .current { background: rgba(233,69,96,0.2); }
+
+.typing-input {
+  width: 100%;
+  max-width: 360px;
+  background: var(--card);
+  border: 2px solid var(--primary);
+  border-radius: var(--radius);
+  color: var(--text);
+  font-size: 16px;
+  padding: 12px 16px;
+  outline: none;
+  resize: none;
+  font-family: inherit;
+  height: 80px;
+}
+.typing-input:focus { border-color: var(--accent); }
+
+.typing-stats {
+  display: flex;
+  gap: 24px;
+  font-size: 14px;
+  color: var(--text-secondary);
+}
+.typing-stats span { color: var(--accent); font-weight: 600; }
+
+/* === 瞄准训练 === */
+.aim-area {
+  width: 100%;
+  max-width: 360px;
+  aspect-ratio: 1;
+  background: var(--card);
+  border-radius: 20px;
+  position: relative;
+  overflow: hidden;
+  cursor: crosshair;
+}
+.aim-target {
+  position: absolute;
+  width: 44px;
+  height: 44px;
+  background: var(--accent);
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  cursor: pointer;
+  transition: opacity 0.1s;
+}
+.aim-target:active { background: var(--accent-light); }
+
+/* === 结果页 === */
+#result {
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.result-emoji { font-size: 56px; margin-bottom: 16px; }
+
+.result-score-label {
+  font-size: 14px;
+  color: var(--text-secondary);
+  margin-bottom: 4px;
+}
+
+.result-score {
+  font-size: 56px;
+  font-weight: 700;
+  color: var(--accent);
+  margin-bottom: 8px;
+}
+
+.result-best {
+  font-size: 15px;
+  color: var(--success);
+  margin-bottom: 4px;
+}
+
+.result-percentile {
+  font-size: 13px;
+  color: var(--text-muted);
+  margin-bottom: 24px;
+}
+
+.result-actions {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+/* === 分享浮层 === */
+#share-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.8);
+  z-index: 100;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+#share-overlay.show { display: flex; }
+#share-card-img {
+  max-width: 90vw;
+  max-height: 70vh;
+  border-radius: 12px;
+}
+.share-hint {
+  color: var(--text-secondary);
+  font-size: 13px;
+  margin: 16px 0;
+}
+.share-close {
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  padding: 12px 32px;
+  border-radius: 12px;
+  font-size: 15px;
+  cursor: pointer;
+}
+
+/* === 进度点 === */
+.progress-dots {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  margin: 8px 0;
+}
+.progress-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--primary);
+  transition: background 0.2s;
+}
+.progress-dot.done { background: var(--success); }
+.progress-dot.current { background: var(--accent); }
+</style>
+</head>
+<body>
+<div id="app">
+  <h1 class="app-title">人类基准测试</h1>
+  <p class="app-subtitle">测测你的各项认知能力</p>
+  <div id="menu"></div>
+  <div id="test-container"></div>
+  <div id="result"></div>
+</div>
+
+<!-- 分享浮层 -->
+<div id="share-overlay">
+  <img id="share-card-img" src="" alt="分享卡片" crossorigin="anonymous">
+  <p class="share-hint">长按图片保存，发到微信群或朋友圈</p>
+  <button class="share-close" id="share-close-btn">关闭</button>
+</div>
+
+<script>
+// ============================================================
+//  常量
+// ============================================================
+const SHARE_URL = 'https://human-bench.pages.dev/';
+const STORAGE_PREFIX = 'humanbench_';
+
+// ============================================================
+//  DOM 引用
+// ============================================================
+const $menu = document.getElementById('menu');
+const $testContainer = document.getElementById('test-container');
+const $result = document.getElementById('result');
+const $shareOverlay = document.getElementById('share-overlay');
+const $shareCardImg = document.getElementById('share-card-img');
+
+// ============================================================
+//  localStorage 工具
+// ============================================================
+function loadScore(testId) {
+  try {
+    const raw = localStorage.getItem(STORAGE_PREFIX + testId);
+    return raw ? JSON.parse(raw) : { best: null, history: [] };
+  } catch { return { best: null, history: [] }; }
+}
+
+function saveScore(testId, score) {
+  const data = loadScore(testId);
+  if (data.best === null || score > data.best) data.best = score;
+  data.history.unshift(score);
+  if (data.history.length > 10) data.history.pop();
+  try { localStorage.setItem(STORAGE_PREFIX + testId, JSON.stringify(data)); } catch {}
+  return data;
+}
+
+function getBest(testId) {
+  return loadScore(testId).best;
+}
+
+// ============================================================
+//  界面切换
+// ============================================================
+function showMenu() {
+  $menu.style.display = '';
+  $testContainer.style.display = 'none';
+  $result.style.display = 'none';
+  renderMenu();
+}
+
+function showTest() {
+  $menu.style.display = 'none';
+  $testContainer.style.display = 'flex';
+  $result.style.display = 'none';
+}
+
+function showResultScreen(test, score, isBetter) {
+  $menu.style.display = 'none';
+  $testContainer.style.display = 'none';
+  $result.style.display = 'flex';
+
+  const percentile = getPercentile(test.id, score);
+  const best = getBest(test.id);
+
+  $result.innerHTML = `
+    <div class="result-emoji">${isBetter ? '🎉' : '📊'}</div>
+    <div class="result-score-label">${test.resultLabel}</div>
+    <div class="result-score">${typeof score === 'number' ? score.toFixed(1) : score}</div>
+    ${isBetter ? '<div class="result-best">🎯 新纪录！</div>' : ''}
+    ${best !== null ? '<div class="result-best">历史最佳：' + best + '</div>' : ''}
+    <div class="result-percentile">${percentile}</div>
+    <div class="result-actions">
+      <button class="btn-primary" id="btn-retry">再试一次</button>
+      <button class="btn-secondary" id="btn-menu">返回菜单</button>
+      <button class="btn-secondary" id="btn-share">分享成绩</button>
+    </div>
+  `;
+
+  document.getElementById('btn-retry').onclick = () => startTest(test);
+  document.getElementById('btn-menu').onclick = showMenu;
+  document.getElementById('btn-share').onclick = () => generateShareCard(test, score);
+}
+
+// ============================================================
+//  百分位参考
+// ============================================================
+function getPercentile(testId, score) {
+  const refs = {
+    reaction: [   // ms 越小越好
+      { threshold: 200, text: '超越 99% 的人 🏆' },
+      { threshold: 230, text: '超越 90% 的人' },
+      { threshold: 270, text: '超越 70% 的人' },
+      { threshold: 320, text: '超越 40% 的人' },
+      { threshold: Infinity, text: '继续努力！' },
+    ],
+    number_memory: [
+      { threshold: 12, text: '超越 99% 的人 🏆' },
+      { threshold: 10, text: '超越 90% 的人' },
+      { threshold: 8, text: '超越 70% 的人' },
+      { threshold: 6, text: '超越 40% 的人' },
+      { threshold: 0, text: '继续努力！' },
+    ],
+    verbal_memory: [
+      { threshold: 80, text: '超越 99% 的人 🏆' },
+      { threshold: 50, text: '超越 90% 的人' },
+      { threshold: 30, text: '超越 70% 的人' },
+      { threshold: 15, text: '超越 40% 的人' },
+      { threshold: 0, text: '继续努力！' },
+    ],
+    visual_memory: [
+      { threshold: 15, text: '超越 99% 的人 🏆' },
+      { threshold: 10, text: '超越 90% 的人' },
+      { threshold: 7, text: '超越 70% 的人' },
+      { threshold: 5, text: '超越 40% 的人' },
+      { threshold: 0, text: '继续努力！' },
+    ],
+    sequence_memory: [
+      { threshold: 15, text: '超越 99% 的人 🏆' },
+      { threshold: 10, text: '超越 90% 的人' },
+      { threshold: 7, text: '超越 70% 的人' },
+      { threshold: 5, text: '超越 40% 的人' },
+      { threshold: 0, text: '继续努力！' },
+    ],
+    typing: [
+      { threshold: 80, text: '超越 99% 的人 🏆' },
+      { threshold: 60, text: '超越 90% 的人' },
+      { threshold: 45, text: '超越 70% 的人' },
+      { threshold: 30, text: '超越 40% 的人' },
+      { threshold: 0, text: '继续努力！' },
+    ],
+    aim_trainer: [
+      { threshold: 350, text: '超越 99% 的人 🏆' },
+      { threshold: 420, text: '超越 90% 的人' },
+      { threshold: 500, text: '超越 70% 的人' },
+      { threshold: 600, text: '超越 40% 的人' },
+      { threshold: Infinity, text: '继续努力！' },
+    ],
+  };
+
+  const list = refs[testId];
+  if (!list) return '';
+  // reaction 和 aim_trainer 是越小越好，其他是越大越好
+  const ascending = ['reaction', 'aim_trainer'].includes(testId);
+  for (const r of list) {
+    if (ascending ? score <= r.threshold : score >= r.threshold) return r.text;
+  }
+  return '';
+}
+
+// ============================================================
+//  测试定义
+// ============================================================
+const TESTS = [
+  // ---- 1. 反应速度 ----
+  {
+    id: 'reaction', emoji: '⚡', name: '反应速度', desc: '屏幕变绿时尽快点击',
+    resultLabel: '平均反应时间', resultUnit: 'ms',
+    init(container, onComplete) {
+      const rounds = 5;
+      const maxErrors = 3; // 错误（过早点击）累计 3 次则整体重新开始
+      let round = 0;
+      let totalTime = 0;
+      let timerStart = 0;
+      let waitTimer = null;
+      let state = 'idle'; // idle | wait | go | result
+      let errors = 0;
+
+      container.innerHTML = `
+        <div class="test-area">
+          <div class="test-hint" id="rhint">点击下方区域开始</div>
+          <div class="reaction-stage reaction-result" id="rbox"></div>
+          <div class="progress-dots" id="rdots">
+            ${Array.from({length:rounds}, (_,i)=>`<div class="progress-dot${i===0?' current':''}" id="rdot${i}"></div>`).join('')}
+          </div>
+          <div class="test-hint" style="font-size:13px;color:var(--text-muted);" id="rscore">${rounds} 次测试取平均值</div>
+          <div class="test-hint" style="font-size:13px;" id="rerrors">错误 0/${maxErrors}</div>
+        </div>
+      `;
+
+      const box = document.getElementById('rbox');
+      const hint = document.getElementById('rhint');
+      const errEl = document.getElementById('rerrors');
+
+      function updateDots() {
+        for (let i = 0; i < rounds; i++) {
+          const d = document.getElementById('rdot'+i);
+          d.className = 'progress-dot' + (i < round ? ' done' : i === round ? ' current' : '');
+        }
+      }
+
+      function updateErrors() {
+        errEl.textContent = `错误 ${errors}/${maxErrors}`;
+        errEl.style.color = errors > 0 ? 'var(--accent)' : 'var(--text-muted)';
+      }
+
+      function goWait() {
+        state = 'wait';
+        box.className = 'reaction-stage reaction-wait';
+        box.textContent = '等待绿色...';
+        hint.textContent = '看到绿色后尽快点击！';
+        const delay = 1000 + Math.random() * 4000;
+        waitTimer = setTimeout(() => {
+          state = 'go';
+          timerStart = performance.now();
+          box.className = 'reaction-stage reaction-go';
+          box.textContent = '点击！';
+          hint.textContent = '快点击！';
+        }, delay);
+      }
+
+      function restart() {
+        round = 0;
+        totalTime = 0;
+        errors = 0;
+        updateDots();
+        updateErrors();
+        state = 'idle';
+        box.className = 'reaction-stage reaction-result';
+        box.textContent = '点击开始';
+        hint.textContent = '点击下方区域开始';
+      }
+
+      function showResult(ms) {
+        state = 'result';
+        box.className = 'reaction-stage reaction-result';
+        box.textContent = ms.toFixed(0) + ' ms';
+        hint.textContent = round < rounds ? '点击继续下一轮' : '';
+        totalTime += ms;
+        round++;
+
+        if (round >= rounds) {
+          updateDots();
+          const avg = totalTime / rounds;
+          const data = saveScore('reaction', avg);
+          showResultScreen(TESTS[0], avg, data.best === avg);
+        } else {
+          updateDots();
+          setTimeout(() => {
+            hint.textContent = '点击下方区域开始第 ' + (round+1) + ' 轮';
+            box.textContent = '点击开始';
+          }, 800);
+        }
+      }
+
+      box.onclick = () => {
+        if (state === 'idle' || state === 'result') {
+          goWait();
+        } else if (state === 'wait') {
+          clearTimeout(waitTimer);
+          errors++;
+          updateErrors();
+          if (errors >= maxErrors) {
+            // 错误累计达上限，整体重新开始
+            state = 'result';
+            box.className = 'reaction-stage reaction-result';
+            box.textContent = '错误过多';
+            hint.textContent = `过早点击 ${maxErrors} 次，测试重新开始`;
+            setTimeout(restart, 1500);
+          } else {
+            state = 'result';
+            box.className = 'reaction-stage reaction-result';
+            box.textContent = '太快了！';
+            hint.textContent = `绿色出现前不要点击（错误 ${errors}/${maxErrors}）`;
+            setTimeout(() => {
+              state = 'result'; // 重置，允许点击重新开始本轮
+              hint.textContent = '点击下方区域重新开始本轮';
+              box.textContent = '点击重试';
+            }, 1000);
+          }
+        } else if (state === 'go') {
+          const elapsed = performance.now() - timerStart;
+          showResult(elapsed);
+        }
+      };
+    },
+    destroy() {}
+  },
+
+  // ---- 2. 数字记忆 ----
+  {
+    id: 'number_memory', emoji: '🔢', name: '数字记忆', desc: '记住逐渐变长的数字串',
+    resultLabel: '最大位数', resultUnit: '位',
+    init(container, onComplete) {
+      let level = 1;          // 当前位数
+      let currentNumber = ''; // 当前要记的数字
+      let userInput = '';
+      let phase = 'intro';    // intro | show | input | result
+
+      container.innerHTML = `
+        <div class="test-area">
+          <div class="test-hint" id="nhint">数字会出现 2 秒，然后消失</div>
+          <div class="test-display" id="ndisplay"></div>
+          <div id="ninput-area" style="display:none;width:100%;max-width:300px;">
+            <input type="tel" id="ninput" class="typing-input" style="height:48px;text-align:center;font-size:24px;letter-spacing:4px;"
+                   inputmode="numeric" autocomplete="off" maxlength="20" placeholder="输入数字">
+            <button class="btn-primary" id="nsubmit" style="margin-top:12px;width:100%;">确认</button>
+          </div>
+          <button class="btn-primary" id="nstart" style="margin-top:12px;">开始</button>
+        </div>
+      `;
+
+      const display = document.getElementById('ndisplay');
+      const inputArea = document.getElementById('ninput-area');
+      const input = document.getElementById('ninput');
+      const hint = document.getElementById('nhint');
+      const startBtn = document.getElementById('nstart');
+
+      function generateNumber(len) {
+        let s = '';
+        for (let i = 0; i < len; i++) s += Math.floor(Math.random() * 10);
+        return s;
+      }
+
+      function showNumber() {
+        currentNumber = generateNumber(level);
+        display.textContent = currentNumber;
+        display.style.color = 'var(--text)';
+        hint.textContent = '记住这个数字';
+        inputArea.style.display = 'none';
+        startBtn.style.display = 'none';
+
+        const showTime = Math.max(2000, level * 500);
+        setTimeout(() => {
+          display.textContent = '';
+          inputArea.style.display = '';
+          input.value = '';
+          input.focus();
+          hint.textContent = '输入你记住的数字（' + level + ' 位）';
+          phase = 'input';
+        }, showTime);
+      }
+
+      function checkInput() {
+        userInput = input.value.trim();
+        if (userInput === currentNumber) {
+          level++;
+          display.textContent = '✓ 正确！';
+          display.style.color = 'var(--success)';
+          hint.textContent = '准备挑战 ' + level + ' 位数';
+          inputArea.style.display = 'none';
+          phase = 'result';
+          setTimeout(showNumber, 1200);
+        } else {
+          display.textContent = '✗ 错误';
+          display.style.color = 'var(--accent)';
+          hint.textContent = '正确数字：' + currentNumber;
+          inputArea.style.display = 'none';
+          const score = level - 1;
+          const data = saveScore('number_memory', score);
+          setTimeout(() => showResultScreen(TESTS[1], score, data.best === score), 1500);
+        }
+      }
+
+      startBtn.onclick = () => { phase = 'show'; showNumber(); };
+      document.getElementById('nsubmit').onclick = () => { if (phase === 'input') checkInput(); };
+      input.addEventListener('keydown', (e) => { if (e.key === 'Enter' && phase === 'input') checkInput(); });
+
+      // 自动聚焦 start 按钮
+      startBtn.focus();
+    },
+    destroy() {}
+  },
+
+  // ---- 3. 词汇记忆 ----
+  {
+    id: 'verbal_memory', emoji: '📝', name: '词汇记忆', desc: '判断词汇是否出现过',
+    resultLabel: '正确次数', resultUnit: '次',
+    init(container, onComplete) {
+      // 中文双字词库
+      const wordPool = [
+        '天空','大地','海洋','森林','阳光','月亮','星辰','风暴','彩虹','闪电',
+        '梦想','希望','勇气','智慧','力量','自由','和平','幸福','快乐','忧伤',
+        '音乐','诗歌','画卷','雕塑','舞蹈','戏剧','电影','小说','童话','寓言',
+        '春天','夏天','秋天','冬天','清晨','黄昏','夜晚','黎明','微风','细雨',
+        '苹果','香蕉','橘子','葡萄','西瓜','草莓','芒果','柠檬','樱桃','桃子',
+        '骏马','飞鸟','游鱼','蝴蝶','蜻蜓','蜜蜂','蚂蚁','蜗牛','海豚','猎豹',
+      ];
+      let seenWords = new Set();
+      let score = 0;
+      let currentWord = '';
+      let _currentIsNew = false;
+
+      container.innerHTML = `
+        <div class="test-area">
+          <div class="test-hint" id="vhint">这个词之前出现过吗？</div>
+          <div class="test-display" id="vword" style="font-size:56px;"></div>
+          <div style="display:flex;gap:16px;margin-top:16px;">
+            <button class="btn-primary" id="vseen" style="background:var(--primary);">见过</button>
+            <button class="btn-primary" id="vnew">新词</button>
+          </div>
+          <div class="test-hint" style="margin-top:8px;color:var(--text-muted);" id="vscore">正确：0</div>
+        </div>
+      `;
+
+      const wordEl = document.getElementById('vword');
+      const hintEl = document.getElementById('vhint');
+      const scoreEl = document.getElementById('vscore');
+
+      function showNext() {
+        const useNew = seenWords.size === 0 || (Math.random() < 0.35 && seenWords.size < wordPool.length);
+        if (useNew) {
+          const unseen = wordPool.filter(w => !seenWords.has(w));
+          if (unseen.length === 0) {
+            // 所有词都已见过，随机选
+            const arr = Array.from(seenWords);
+            currentWord = arr[Math.floor(Math.random() * arr.length)];
+            _currentIsNew = false;
+          } else {
+            currentWord = unseen[Math.floor(Math.random() * unseen.length)];
+            seenWords.add(currentWord);
+            _currentIsNew = true;
+          }
+        } else {
+          const arr = Array.from(seenWords);
+          currentWord = arr[Math.floor(Math.random() * arr.length)];
+          _currentIsNew = false;
+        }
+        wordEl.textContent = currentWord;
+        wordEl.style.color = 'var(--text)';
+        scoreEl.textContent = '正确：' + score;
+      }
+
+      document.getElementById('vseen').onclick = () => {
+        if (_currentIsNew) {
+          // 用户说是"见过"但实际是新词 → 错
+          wordEl.style.color = 'var(--accent)';
+          hintEl.textContent = '这是新词！';
+          const data = saveScore('verbal_memory', score);
+          setTimeout(() => showResultScreen(TESTS[2], score, data.best === score), 1000);
+        } else {
+          score++;
+          hintEl.textContent = '✓ 正确！';
+          wordEl.style.color = 'var(--success)';
+          setTimeout(showNext, 400);
+        }
+      };
+
+      document.getElementById('vnew').onclick = () => {
+        if (_currentIsNew) {
+          score++;
+          hintEl.textContent = '✓ 正确！';
+          wordEl.style.color = 'var(--success)';
+          setTimeout(showNext, 400);
+        } else {
+          wordEl.style.color = 'var(--accent)';
+          hintEl.textContent = '这个词已经出现过了！';
+          const data = saveScore('verbal_memory', score);
+          setTimeout(() => showResultScreen(TESTS[2], score, data.best === score), 1000);
+        }
+      };
+
+      showNext();
+    },
+    destroy() {}
+  },
+
+  // ---- 4. 视觉记忆 ----
+  {
+    id: 'visual_memory', emoji: '👁️', name: '视觉记忆', desc: '记住亮起格子的位置',
+    resultLabel: '最大格子数', resultUnit: '个',
+    init(container, onComplete) {
+      let level = 3;     // 当前亮格数
+      let gridSize = 3;  // 网格大小
+      let litCells = []; // 当前亮格坐标 [row, col]
+      let userSelected = new Set();
+      let phase = 'show'; // show | input
+
+      function buildGrid() {
+        gridSize = Math.min(9, 3 + Math.floor((level - 3) / 2));
+        container.innerHTML = `
+          <div class="test-area">
+            <div class="test-hint" id="vhint">记住亮起格子的位置</div>
+            <div class="memory-grid" id="vgrid" style="grid-template-columns:repeat(${gridSize},1fr);"></div>
+            <div class="test-hint" style="margin-top:8px;color:var(--text-muted);" id="vstatus">${level} 个格子</div>
+          </div>
+        `;
+
+        const grid = document.getElementById('vgrid');
+        for (let r = 0; r < gridSize; r++) {
+          for (let c = 0; c < gridSize; c++) {
+            const cell = document.createElement('div');
+            cell.className = 'memory-cell';
+            cell.dataset.row = r;
+            cell.dataset.col = c;
+            cell.onclick = () => onCellClick(r, c, cell);
+            grid.appendChild(cell);
+          }
+        }
+
+        // 随机选择亮格
+        litCells = [];
+        const total = gridSize * gridSize;
+        const indices = new Set();
+        while (indices.size < level) indices.add(Math.floor(Math.random() * total));
+        for (const idx of indices) {
+          litCells.push({ r: Math.floor(idx / gridSize), c: idx % gridSize });
+        }
+
+        // 显示亮格
+        phase = 'show';
+        const cells = grid.querySelectorAll('.memory-cell');
+        litCells.forEach(({r, c}) => {
+          const idx = r * gridSize + c;
+          cells[idx].classList.add('lit');
+        });
+
+        // 2 秒后隐藏
+        setTimeout(() => {
+          cells.forEach(c => c.classList.remove('lit'));
+          phase = 'input';
+          document.getElementById('vhint').textContent = '点击刚才亮起的格子';
+          userSelected.clear();
+        }, 2000);
+      }
+
+      function onCellClick(r, c, cell) {
+        if (phase !== 'input') return;
+        const key = r + ',' + c;
+        if (userSelected.has(key)) {
+          userSelected.delete(key);
+          cell.classList.remove('user-lit');
+        } else {
+          userSelected.add(key);
+          cell.classList.add('user-lit');
+          checkResult();
+        }
+      }
+
+      function checkResult() {
+        if (userSelected.size < litCells.length) return;
+
+        const correct = litCells.every(({r, c}) => userSelected.has(r + ',' + c)) &&
+                        userSelected.size === litCells.length;
+
+        if (correct) {
+          level++;
+          document.getElementById('vhint').textContent = '✓ 全部正确！';
+          document.getElementById('vstatus').textContent = '准备下一个难度...';
+          setTimeout(buildGrid, 1000);
+        } else {
+          // 标记正确和错误
+          const grid = document.getElementById('vgrid');
+          const cells = grid.querySelectorAll('.memory-cell');
+          litCells.forEach(({r, c}) => {
+            cells[r * gridSize + c].classList.add('correct');
+          });
+          userSelected.forEach(key => {
+            if (!litCells.some(({r,c}) => (r+','+c) === key)) {
+              const [r, c] = key.split(',').map(Number);
+              cells[r * gridSize + c].classList.add('wrong');
+            }
+          });
+          const score = level - 1;
+          const data = saveScore('visual_memory', score);
+          setTimeout(() => showResultScreen(TESTS[3], score, data.best === score), 1500);
+        }
+      }
+
+      buildGrid();
+    },
+    destroy() {}
+  },
+
+  // ---- 5. 序列记忆 ----
+  {
+    id: 'sequence_memory', emoji: '🧠', name: '序列记忆', desc: '记住并复现方块的亮起顺序',
+    resultLabel: '最大序列长度', resultUnit: '步',
+    init(container, onComplete) {
+      const GRID = 3;
+      let sequence = [];   // 当前序列 [{r, c}, ...]
+      let userStep = 0;    // 用户当前按到第几步
+      let phase = 'show';  // show | input
+
+      container.innerHTML = `
+        <div class="test-area">
+          <div class="test-hint" id="shint">记住方块亮起的顺序</div>
+          <div class="memory-grid" id="sgrid" style="grid-template-columns:repeat(${GRID},1fr);max-width:300px;"></div>
+          <div class="test-hint" style="margin-top:8px;color:var(--text-muted);" id="sstatus">序列长度：1</div>
+        </div>
+      `;
+
+      const grid = document.getElementById('sgrid');
+      for (let r = 0; r < GRID; r++) {
+        for (let c = 0; c < GRID; c++) {
+          const cell = document.createElement('div');
+          cell.className = 'memory-cell';
+          cell.dataset.row = r;
+          cell.dataset.col = c;
+          cell.onclick = () => onCellClick(r, c, cell);
+          grid.appendChild(cell);
+        }
+      }
+
+      function nextRound() {
+        // 增加一个随机位置到序列
+        const newPos = { r: Math.floor(Math.random() * GRID), c: Math.floor(Math.random() * GRID) };
+        sequence.push(newPos);
+        userStep = 0;
+        phase = 'show';
+
+        document.getElementById('shint').textContent = '记住顺序...';
+        document.getElementById('sstatus').textContent = '序列长度：' + sequence.length;
+
+        // 依次亮起
+        const cells = grid.querySelectorAll('.memory-cell');
+        sequence.forEach((pos, i) => {
+          setTimeout(() => {
+            cells[pos.r * GRID + pos.c].classList.add('lit');
+            setTimeout(() => {
+              cells[pos.r * GRID + pos.c].classList.remove('lit');
+            }, 400);
+          }, i * 600);
+        });
+
+        // 最后一个亮完后，进入输入阶段
+        setTimeout(() => {
+          phase = 'input';
+          document.getElementById('shint').textContent = '按顺序点击方块';
+        }, sequence.length * 600 + 200);
+      }
+
+      function onCellClick(r, c, cell) {
+        if (phase !== 'input') return;
+
+        const expected = sequence[userStep];
+        if (r === expected.r && c === expected.c) {
+          // 正确
+          cell.classList.add('user-lit');
+          setTimeout(() => cell.classList.remove('user-lit'), 200);
+          userStep++;
+
+          if (userStep >= sequence.length) {
+            // 完成本轮
+            phase = 'show';
+            document.getElementById('shint').textContent = '✓ 正确！';
+            setTimeout(nextRound, 800);
+          }
+        } else {
+          // 错误
+          cell.classList.add('wrong');
+          // 显示正确位置
+          const cells = grid.querySelectorAll('.memory-cell');
+          cells[expected.r * GRID + expected.c].classList.add('correct');
+
+          const score = sequence.length - 1;
+          const data = saveScore('sequence_memory', score);
+          setTimeout(() => showResultScreen(TESTS[4], score, data.best === score), 1200);
+        }
+      }
+
+      nextRound();
+    },
+    destroy() {}
+  },
+
+  // ---- 6. 打字速度 ----
+  {
+    id: 'typing', emoji: '⌨️', name: '打字速度', desc: '60 秒内尽可能快和准确地输入',
+    resultLabel: '打字速度', resultUnit: 'WPM',
+    init(container, onComplete) {
+      const texts = [
+        "The quick brown fox jumps over the lazy dog. This pangram contains every letter of the English alphabet at least once.",
+        "Learning to code is like learning a new language. It takes time and practice, but the results are truly rewarding and empowering.",
+        "Technology has changed the way we live and work. From smartphones to artificial intelligence, innovation continues to shape our world.",
+        "The best way to predict the future is to create it. Every great achievement starts with a single step and the courage to begin.",
+        "Reading books opens doors to new worlds and ideas. Each page turned is a step toward understanding the vast universe of human knowledge.",
+        "Music is the universal language of mankind. It transcends borders and brings people together in ways that words alone cannot express.",
+      ];
+      const text = texts[Math.floor(Math.random() * texts.length)];
+      const words = text.split(' ');
+      const DURATION = 60; // 秒
+
+      let userInput = '';
+      let correctChars = 0;
+      let totalTyped = 0;
+      let timeLeft = DURATION;
+      let timer = null;
+      let started = false;
+
+      container.innerHTML = `
+        <div class="test-area">
+          <div class="test-hint" id="thint">输入下方文本，自动开始计时</div>
+          <div class="typing-text-display" id="ttext"></div>
+          <textarea class="typing-input" id="tinput" placeholder="在此输入..." autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"></textarea>
+          <div class="typing-stats">
+            <div>⏱️ <span id="ttime">${DURATION}</span>s</div>
+            <div>📊 <span id="twpm">0</span> WPM</div>
+          </div>
+        </div>
+      `;
+
+      const textDisplay = document.getElementById('ttext');
+      const input = document.getElementById('tinput');
+      const timeEl = document.getElementById('ttime');
+      const wpmEl = document.getElementById('twpm');
+
+      // 渲染原文（初始状态全部灰）
+      function renderText() {
+        let html = '';
+        for (let i = 0; i < text.length; i++) {
+          let cls = '';
+          if (i < totalTyped) {
+            cls = userInput[i] === text[i] ? 'correct' : 'incorrect';
+          } else if (i === totalTyped) {
+            cls = 'current';
+          }
+          html += `<span class="${cls}">${text[i]}</span>`;
+        }
+        textDisplay.innerHTML = html;
+      }
+      renderText();
+
+      input.oninput = () => {
+        if (!started && input.value.length > 0) {
+          started = true;
+          timer = setInterval(updateTimer, 1000);
+          document.getElementById('thint').textContent = '输入中...';
+        }
+
+        userInput = input.value;
+        correctChars = 0;
+        totalTyped = Math.min(userInput.length, text.length);
+        for (let i = 0; i < totalTyped; i++) {
+          if (userInput[i] === text[i]) correctChars++;
+        }
+
+        renderText();
+
+        // 计算 WPM
+        const elapsedMin = (DURATION - timeLeft + 1) / 60;
+        const wpm = elapsedMin > 0 ? Math.round((correctChars / 5) / elapsedMin) : 0;
+        wpmEl.textContent = Math.max(0, wpm);
+
+        // 输入完整文本，自动结束
+        if (userInput.length >= text.length) {
+          endTest();
+        }
+      };
+
+      function updateTimer() {
+        timeLeft--;
+        timeEl.textContent = timeLeft;
+        if (timeLeft <= 0) {
+          endTest();
+        }
+      }
+
+      function endTest() {
+        clearInterval(timer);
+        input.disabled = true;
+        const elapsedMin = (DURATION - timeLeft) / 60;
+        const wpm = elapsedMin > 0 ? Math.round((correctChars / 5) / elapsedMin) : 0;
+        const data = saveScore('typing', wpm);
+        showResultScreen(TESTS[5], wpm, data.best === wpm);
+      }
+    },
+    destroy() {}
+  },
+
+  // ---- 7. 瞄准训练 ----
+  {
+    id: 'aim_trainer', emoji: '🎯', name: '瞄准训练', desc: '尽快点击随机出现的目标',
+    resultLabel: '平均反应时间', resultUnit: 'ms',
+    init(container, onComplete) {
+      const TOTAL_TARGETS = 30;
+      let targetsLeft = TOTAL_TARGETS;
+      let totalTime = 0;
+      let targetTimer = 0;
+
+      container.innerHTML = `
+        <div class="test-area">
+          <div class="test-hint" id="ahint">点击红色目标（剩余 ${TOTAL_TARGETS} 个）</div>
+          <div class="aim-area" id="aarea"></div>
+          <div class="progress-dots" id="adots">
+            ${Array.from({length:Math.min(TOTAL_TARGETS,15)}, (_,i)=>`<div class="progress-dot" id="adot${i}"></div>`).join('')}
+          </div>
+        </div>
+      `;
+
+      const area = document.getElementById('aarea');
+      const hint = document.getElementById('ahint');
+
+      function spawnTarget() {
+        // 清除旧目标
+        area.querySelectorAll('.aim-target').forEach(t => t.remove());
+
+        const target = document.createElement('div');
+        target.className = 'aim-target';
+
+        // 随机位置（留边距）
+        const margin = 30;
+        const x = margin + Math.random() * (area.clientWidth - margin * 2);
+        const y = margin + Math.random() * (area.clientHeight - margin * 2);
+        target.style.left = x + 'px';
+        target.style.top = y + 'px';
+
+        targetTimer = performance.now();
+
+        target.onclick = (e) => {
+          e.stopPropagation();
+          const elapsed = performance.now() - targetTimer;
+          totalTime += elapsed;
+          targetsLeft--;
+
+          hint.textContent = '点击红色目标（剩余 ' + targetsLeft + ' 个）';
+          updateDots();
+
+          if (targetsLeft <= 0) {
+            const avg = totalTime / TOTAL_TARGETS;
+            const data = saveScore('aim_trainer', avg);
+            showResultScreen(TESTS[6], avg, data.best === avg);
+          } else {
+            setTimeout(spawnTarget, 100);
+          }
+        };
+
+        area.appendChild(target);
+      }
+
+      function updateDots() {
+        const done = TOTAL_TARGETS - targetsLeft;
+        for (let i = 0; i < Math.min(TOTAL_TARGETS, 15); i++) {
+          const d = document.getElementById('adot'+i);
+          if (d) {
+            // 把 30 个目标映射到 15 个点
+            const threshold = Math.round((i + 1) / 15 * TOTAL_TARGETS);
+            d.className = 'progress-dot' + (done >= threshold ? ' done' : '');
+          }
+        }
+      }
+
+      // 点击空白区域不算
+      area.addEventListener('click', (e) => {
+        if (e.target === area) {
+          // 点空了，不算
+        }
+      });
+
+      spawnTarget();
+    },
+    destroy() {}
+  },
+];
+
+// ============================================================
+//  渲染主菜单
+// ============================================================
+function renderMenu() {
+  let html = '';
+  TESTS.forEach(test => {
+    const best = getBest(test.id);
+    html += `
+      <div class="test-card" data-test="${test.id}">
+        <div class="test-card-emoji">${test.emoji}</div>
+        <div class="test-card-info">
+          <div class="test-card-name">${test.name}</div>
+          <div class="test-card-desc">${test.desc}</div>
+          ${best !== null ? '<div class="test-card-best">最佳：' + (typeof best === 'number' ? best.toFixed(1) : best) + ' ' + test.resultUnit + '</div>' : ''}
+        </div>
+        <div class="test-card-arrow">›</div>
+      </div>
+    `;
+  });
+  $menu.innerHTML = html;
+
+  // 绑定点击事件
+  $menu.querySelectorAll('.test-card').forEach(card => {
+    card.onclick = () => {
+      const testId = card.dataset.test;
+      const test = TESTS.find(t => t.id === testId);
+      if (test) startTest(test);
+    };
+  });
+}
+
+// ============================================================
+//  启动测试
+// ============================================================
+function startTest(test) {
+  $testContainer.innerHTML = `
+    <div class="test-header">
+      <button class="btn-back" id="btn-back">← 返回</button>
+      <div class="test-title">${test.emoji} ${test.name}</div>
+      <div style="width:60px;"></div>
+    </div>
+    <div class="test-content" id="test-inner"></div>
+  `;
+  showTest();
+
+  document.getElementById('btn-back').onclick = showMenu;
+
+  test.destroy(); // 清除上一次的状态
+  test.init(document.getElementById('test-inner'));
+}
+
+// ============================================================
+//  分享卡片生成
+// ============================================================
+function generateShareCard(test, score) {
+  const W = 1200, H = 1600;
+  const canvas = document.createElement('canvas');
+  canvas.width = W; canvas.height = H;
+  const ctx = canvas.getContext('2d');
+
+  // 深色背景
+  const bgGrad = ctx.createLinearGradient(0, 0, 0, H);
+  bgGrad.addColorStop(0, '#1a1a2e');
+  bgGrad.addColorStop(0.5, '#16213e');
+  bgGrad.addColorStop(1, '#0f0f23');
+  ctx.fillStyle = bgGrad; ctx.fillRect(0, 0, W, H);
+
+  // 装饰圆
+  ctx.globalAlpha = 0.06;
+  [
+    { x: 180, y: 320, r: 300, c: '#e94560' },
+    { x: 1050, y: 280, r: 220, c: '#0f3460' },
+    { x: 1020, y: 1300, r: 280, c: '#4ecca3' },
+    { x: 140, y: 1380, r: 180, c: '#e94560' },
+  ].forEach(d => {
+    ctx.fillStyle = d.c;
+    ctx.beginPath(); ctx.arc(d.x, d.y, d.r, 0, Math.PI * 2); ctx.fill();
+  });
+  ctx.globalAlpha = 1;
+
+  // 顶部装饰线
+  ctx.strokeStyle = '#e94560'; ctx.lineWidth = 3;
+  ctx.beginPath(); ctx.moveTo(160, 120); ctx.lineTo(W - 160, 120); ctx.stroke();
+
+  // 标题
+  ctx.textAlign = 'center';
+  ctx.fillStyle = '#eaeaea';
+  ctx.font = "bold 68px -apple-system, 'PingFang SC', sans-serif";
+  ctx.fillText('人类基准测试', W / 2, 210);
+
+  ctx.fillStyle = '#6a6a7a';
+  ctx.font = "30px -apple-system, 'PingFang SC', sans-serif";
+  ctx.fillText('测测你的认知能力极限', W / 2, 270);
+
+  // 成绩卡片
+  const cx = 100, cy = 360, cw = W - 200, ch = 520;
+  ctx.fillStyle = 'rgba(255,255,255,0.04)';
+  ctx.strokeStyle = 'rgba(233,69,96,0.2)'; ctx.lineWidth = 2;
+  roundRect(ctx, cx, cy, cw, ch, 28); ctx.fill(); ctx.stroke();
+
+  // 测试名称
+  ctx.fillStyle = '#a0a0b0';
+  ctx.font = "28px -apple-system, 'PingFang SC', sans-serif";
+  ctx.fillText(test.name + ' · 成绩分享', W / 2, cy + 60);
+
+  // 大号分数
+  ctx.fillStyle = '#e94560';
+  ctx.font = "bold 130px -apple-system, 'PingFang SC', sans-serif";
+  const scoreText = typeof score === 'number' ? score.toFixed(1) : String(score);
+  ctx.fillText(scoreText, W / 2, cy + 210);
+
+  // 单位
+  ctx.fillStyle = '#6a6a7a';
+  ctx.font = "32px -apple-system, 'PingFang SC', sans-serif";
+  ctx.fillText(test.resultLabel + '（' + test.resultUnit + '）', W / 2, cy + 270);
+
+  // 百分位
+  const percentile = getPercentile(test.id, score);
+  if (percentile) {
+    ctx.fillStyle = '#4ecca3';
+    ctx.font = "28px -apple-system, 'PingFang SC', sans-serif";
+    ctx.fillText(percentile, W / 2, cy + 340);
+  }
+
+  // 分隔虚线
+  ctx.strokeStyle = 'rgba(255,255,255,0.1)'; ctx.lineWidth = 1;
+  ctx.setLineDash([10, 8]);
+  ctx.beginPath(); ctx.moveTo(cx + 40, cy + 380); ctx.lineTo(cx + cw - 40, cy + 380); ctx.stroke();
+  ctx.setLineDash([]);
+
+  // 特性文字
+  const features = ['⚡ 反应速度  🎯 瞄准训练  🧠 记忆挑战', '7 项认知能力测试 · 挑战人类极限'];
+  ctx.fillStyle = '#6a6a7a';
+  ctx.font = "24px -apple-system, 'PingFang SC', sans-serif";
+  features.forEach((f, i) => ctx.fillText(f, W / 2, cy + 440 + i * 38));
+
+  // ============================================================
+  //  预保存不含 QR 的基础版本（防止 cross-origin QR 使 canvas 污染导致 toDataURL 失败）
+  // ============================================================
+  const baseDataURL = canvas.toDataURL('image/png');
+
+  // ============================================================
+  //  加载 QR 码
+  // ============================================================
+  const qrImg = new Image();
+  qrImg.crossOrigin = 'anonymous';
+  qrImg.onload = function() {
+    const qs = 260, qx = (W - qs) / 2, qy = H - 380;
+    // 白色 QR 背景
+    ctx.fillStyle = '#fff';
+    roundRect(ctx, qx - 24, qy - 24, qs + 48, qs + 48, 28); ctx.fill();
+    ctx.strokeStyle = '#e94560'; ctx.lineWidth = 3;
+    roundRect(ctx, qx - 24, qy - 24, qs + 48, qs + 48, 28); ctx.stroke();
+    ctx.drawImage(qrImg, qx, qy, qs, qs);
+
+    ctx.fillStyle = '#6a6a7a';
+    ctx.font = "italic 26px -apple-system, 'PingFang SC', sans-serif";
+    ctx.textAlign = 'center';
+    ctx.fillText('扫码或长按识别 · human-bench.pages.dev', W / 2, H - 60);
+
+    try {
+      $shareCardImg.src = canvas.toDataURL('image/png');
+    } catch(e) {
+      // canvas 被跨域 QR 污染，回退到不含 QR 的基础版本
+      $shareCardImg.src = baseDataURL;
+    }
+    $shareOverlay.classList.add('show');
+    document.body.style.overflow = 'hidden';
+  };
+  qrImg.onerror = function() {
+    // QR 加载失败，使用不含 QR 的基础版本
+    $shareCardImg.src = baseDataURL;
+    $shareOverlay.classList.add('show');
+    document.body.style.overflow = 'hidden';
+  };
+  qrImg.src = 'https://api.qrserver.com/v1/create-qr-code/?size=280x280&margin=6&data=' + encodeURIComponent(SHARE_URL);
+}
+
+function roundRect(ctx, x, y, w, h, r) {
+  ctx.beginPath();
+  ctx.moveTo(x + r, y); ctx.lineTo(x + w - r, y);
+  ctx.arcTo(x + w, y, x + w, y + r, r);
+  ctx.lineTo(x + w, y + h - r);
+  ctx.arcTo(x + w, y + h, x + w - r, y + h, r);
+  ctx.lineTo(x + r, y + h);
+  ctx.arcTo(x, y + h, x, y + h - r, r);
+  ctx.lineTo(x, y + r); ctx.arcTo(x, y, x + r, y, r);
+  ctx.closePath();
+}
+
+// ============================================================
+//  分享浮层关闭
+// ============================================================
+document.getElementById('share-close-btn').onclick = () => {
+  $shareOverlay.classList.remove('show');
+};
+
+// ============================================================
+//  启动应用
+// ============================================================
+showMenu();
+</script>
+</body>
+</html>
