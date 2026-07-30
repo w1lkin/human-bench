@@ -626,6 +626,7 @@ const TESTS = [
       let waitTimer = null;
       let state = 'idle'; // idle | wait | go | result
       let errors = 0;
+      let awaitingRestart = false;
 
       container.innerHTML = `
         <div class="test-area">
@@ -636,12 +637,15 @@ const TESTS = [
           </div>
           <div class="test-hint" style="font-size:13px;color:var(--text-muted);" id="rscore">${rounds} 次测试取平均值</div>
           <div class="test-hint" style="font-size:13px;" id="rerrors">错误 0/${maxErrors}</div>
+          <button class="btn-primary" id="rrestart" style="display:none;margin-top:8px;">重新开始</button>
         </div>
       `;
 
       const box = document.getElementById('rbox');
       const hint = document.getElementById('rhint');
       const errEl = document.getElementById('rerrors');
+      const restartBtn = document.getElementById('rrestart');
+      restartBtn.onclick = () => restart();
 
       function updateDots() {
         for (let i = 0; i < rounds; i++) {
@@ -674,8 +678,10 @@ const TESTS = [
         round = 0;
         totalTime = 0;
         errors = 0;
+        awaitingRestart = false;
         updateDots();
         updateErrors();
+        restartBtn.style.display = 'none';
         state = 'idle';
         box.className = 'reaction-stage reaction-result';
         box.textContent = '点击开始';
@@ -705,6 +711,7 @@ const TESTS = [
       }
 
       box.onclick = () => {
+        if (awaitingRestart) return; // 等待用户点击「重新开始」，忽略棋盘点击
         if (state === 'idle' || state === 'result') {
           goWait();
         } else if (state === 'wait') {
@@ -712,12 +719,13 @@ const TESTS = [
           errors++;
           updateErrors();
           if (errors >= maxErrors) {
-            // 错误累计达上限，整体重新开始
+            // 错误累计达上限，提示用户点击「重新开始」
+            awaitingRestart = true;
             state = 'result';
             box.className = 'reaction-stage reaction-result';
             box.textContent = '错误过多';
-            hint.textContent = `过早点击 ${maxErrors} 次，测试重新开始`;
-            setTimeout(restart, 1500);
+            hint.textContent = `过早点击 ${maxErrors} 次，请点击下方「重新开始」`;
+            restartBtn.style.display = '';
           } else {
             state = 'result';
             box.className = 'reaction-stage reaction-result';
