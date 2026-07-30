@@ -360,7 +360,15 @@ body {
   text-align: center;
 }
 
-.result-emoji { font-size: 56px; margin-bottom: 16px; }
+.result-emoji { font-size: 56px; margin-bottom: 8px; }
+
+.result-game-name {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 12px;
+  letter-spacing: 1px;
+}
 
 .result-score-label {
   font-size: 14px;
@@ -526,6 +534,7 @@ function showResultScreen(test, score, isBetter) {
 
   $result.innerHTML = `
     <div class="result-emoji">${isBetter ? '🎉' : '📊'}</div>
+    <div class="result-game-name">${test.emoji} ${test.name}</div>
     <div class="result-score-label">${test.resultLabel}</div>
     <div class="result-score">${typeof score === 'number' ? score.toFixed(1) : score}</div>
     ${isBetter ? '<div class="result-best">🎯 新纪录！</div>' : ''}
