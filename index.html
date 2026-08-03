@@ -10,7 +10,9 @@
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://human-bench.w1lkin.site/">
   <meta property="og:image" content="https://human-bench.w1lkin.site/share-card.png">
+<meta name="api-base" content="https://api.w1lkin.site">
 <title>人类基准测试</title>
+<script src="https://api.w1lkin.site/sdk.js"></script>
 <style>
 /* === CSS 变量：深色科技风主题 === */
 :root {
@@ -454,6 +456,9 @@ body {
 </style>
 </head>
 <body>
+<!-- 云端平台栏（登录态/登出）与排行榜浮窗，由 SDK 注入 -->
+<div id="gp-bar" style="position:fixed;top:0;left:0;right:0;z-index:50;"></div>
+<div id="gp-leaderboard" style="position:fixed;right:8px;bottom:8px;z-index:50;"></div>
 <div id="app">
   <h1 class="app-title">人类基准测试</h1>
   <p class="app-subtitle">测测你的各项认知能力</p>
@@ -474,7 +479,6 @@ body {
 //  常量
 // ============================================================
 const SHARE_URL = 'https://human-bench.w1lkin.site/';
-const STORAGE_PREFIX = 'humanbench_';
 
 // ============================================================
 //  DOM 引用
@@ -486,24 +490,39 @@ const $shareOverlay = document.getElementById('share-overlay');
 const $shareCardImg = document.getElementById('share-card-img');
 
 // ============================================================
-//  localStorage 工具
+//  云端存储（GamePlatform）
+//  各子测试成绩统一上报到 gameId='human-bench'，用 meta.testId 区分；
+//  启动时拉取全量灌入内存缓存，之后同步读取，保证菜单/结算页即时渲染。
 // ============================================================
-function loadScore(testId) {
-  try {
-    const raw = localStorage.getItem(STORAGE_PREFIX + testId);
-    return raw ? JSON.parse(raw) : { best: null, history: [] };
-  } catch { return { best: null, history: [] }; }
-}
-
-function saveScore(testId, score) {
-  const data = loadScore(testId);
-  if (data.best === null || score > data.best) data.best = score;
+const GAME_ID = 'human-bench';
+const HISTORY_LIMIT = 10;
+let _scoreCache = {}; // testId -> { best, history:[] }
+function _mergeItem(testId, score) {
+  const data = _scoreCache[testId] || { best: null, history: [] };
+  if (data.best === null || isBetter(testId, score, data.best)) data.best = score;
   data.history.unshift(score);
-  if (data.history.length > 10) data.history.pop();
-  try { localStorage.setItem(STORAGE_PREFIX + testId, JSON.stringify(data)); } catch {}
+  if (data.history.length > HISTORY_LIMIT) data.history.pop();
+  _scoreCache[testId] = data;
   return data;
 }
-
+async function hydrateScores() {
+  try {
+    const items = await GamePlatform.getMyScores(GAME_ID, 200);
+    _scoreCache = {};
+    (items || []).forEach(it => {
+      if (it.meta && it.meta.testId) _mergeItem(it.meta.testId, it.score);
+    });
+  } catch (e) { _scoreCache = {}; }
+  return _scoreCache;
+}
+function loadScore(testId) {
+  return _scoreCache[testId] || { best: null, history: [] };
+}
+function saveScore(testId, score) {
+  const data = _mergeItem(testId, score);
+  GamePlatform.submitScore(GAME_ID, score, { testId }).catch(() => {});
+  return data;
+}
 function getBest(testId) {
   return loadScore(testId).best;
 }
@@ -1519,9 +1538,15 @@ document.getElementById('share-close-btn').onclick = () => {
 };
 
 // ============================================================
-//  启动应用
+//  启动应用（硬登录门 + 云端战绩）
 // ============================================================
-showMenu();
+GamePlatform.init().then(() => {
+  GamePlatform.mountBar(document.getElementById('gp-bar'));
+  GamePlatform.mountLeaderboard(document.getElementById('gp-leaderboard'), { gameId: GAME_ID, title: '人类基准 · 排行榜' });
+  GamePlatform.mountGate({ gameId: GAME_ID }).then(() => {
+    hydrateScores().then(() => showMenu());
+  });
+});
 </script>
 </body>
 </html>
