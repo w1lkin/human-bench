@@ -100,7 +100,7 @@ qrImg.onload = function() {
   ctx.fillStyle = '#6a6a7a';
   ctx.font = "italic 26px -apple-system, 'PingFang SC', sans-serif";
   ctx.textAlign = 'center';
-  ctx.fillText('扫码体验 · human-bench.w1lkin.site', W / 2, H - 100);
+  ctx.fillText('扫码体验 · human-bench.pages.dev', W / 2, H - 100);
 
   document.getElementById('dl-btn').disabled = false;
   document.getElementById('status-text').textContent = '点击下载 PNG，上传为 og:image';
@@ -109,7 +109,7 @@ qrImg.onerror = function() {
   document.getElementById('dl-btn').disabled = true;
   document.getElementById('status-text').textContent = 'QR 码加载失败，请检查网络';
 };
-qrImg.src = 'https://api.qrserver.com/v1/create-qr-code/?size=280x280&margin=6&data=' + encodeURIComponent('https://human-bench.w1lkin.site/');
+qrImg.src = 'https://api.qrserver.com/v1/create-qr-code/?size=280x280&margin=6&data=' + encodeURIComponent('https://human-bench.pages.dev/');
 
 function rr(x, y, w, h, r) {
   ctx.beginPath();
