@@ -75,12 +75,14 @@
 - 每点击一个目标，下一个立即出现在新位置
 - 完成 30 个后显示平均反应时间和命中率
 
-## localStorage 数据结构
+## 云端存储结构
 
 ```js
-// key: 'humanbench_{testId}'
-// value: { best: number, history: [number, ...] }
-// history 保留最近 10 条记录
+// 通过 GamePlatform SDK 上报，统一 gameId = 'human-bench'
+// 子测试以 meta.testId 区分：'reaction' | 'number_memory' | 'verbal_memory' | 'visual_memory' | 'sequence_memory' | 'typing' | 'aim_trainer'
+// 服务端存储 { score, meta:{testId}, created_at }
+// 客户端维护内存缓存 { best, history:[...] }（history 保留最近 10 条），启动时由 getMyScores 拉全量灌入
+// 前端无 localStorage，硬性登录门（mountGate）包裹启动
 ```
 
 ## 百分位参考数据（内置对照表）
