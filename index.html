@@ -1539,10 +1539,9 @@ document.getElementById('share-close-btn').onclick = () => {
 // ============================================================
 //  启动应用（硬登录门 + 云端战绩）
 // ============================================================
-GamePlatform.init().then(() => {
-  GamePlatform.mountGate({ gameId: GAME_ID }).then(() => {
-    hydrateScores().then(() => showMenu());
-  });
+GamePlatform.init(); // 同步处理 ?token= 并写入 cookie（返回 token 字符串，非 Promise）
+GamePlatform.mountGate({ gameId: GAME_ID }).then(() => {
+  hydrateScores().then(() => showMenu());
 });
 </script>
 </body>
