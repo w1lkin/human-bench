@@ -43,7 +43,7 @@ HTML
 
 - 每个子测试是一个独立的对象，包含 `id`、`name`、`desc`、`emoji`、`init()`、`destroy()` 方法
 - 在主菜单点击测试卡片 → 隐藏菜单 → 调用 `test.init()` → 渲染测试界面到 `#test-container`
-- 测试完成后显示 `#result`，展示本次得分和历史最佳（localStorage 存储）
+- 测试完成后显示 `#result`，展示本次得分和历史最佳（云端存储，需登录后上报）
 
 ## 移动交互约定
 
@@ -54,7 +54,7 @@ HTML
 
 ## 数据存储
 
-- 每个测试的最高分存储在 `localStorage`，key 格式：`humanbench_{testId}`
+- 每个测试的成绩统一上报到云端 `gameId='human-bench'`（子测试用 `meta.testId` 区分），需登录后游玩；本地不再保存任何数据
 - 每次测试完成对比并更新最高分
 
 ## 约定
