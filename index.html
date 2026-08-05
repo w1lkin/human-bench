@@ -498,39 +498,31 @@ const $shareCardImg = document.getElementById('share-card-img');
 // ============================================================
 //  云端存储（GamePlatform）
 //  各子测试成绩统一上报到 gameId='human-bench'，用 meta.testId 区分；
-//  启动时拉取全量灌入内存缓存，之后同步读取，保证菜单/结算页即时渲染。
+//  个人最佳记录从云端 getMyScores 实时拉取，不走本地缓存。
 // ============================================================
 const GAME_ID = 'human-bench';
-const HISTORY_LIMIT = 10;
-let _scoreCache = {}; // testId -> { best, history:[] }
-function _mergeItem(testId, score) {
-  const data = _scoreCache[testId] || { best: null, history: [] };
-  if (data.best === null || isBetter(testId, score, data.best)) data.best = score;
-  data.history.unshift(score);
-  if (data.history.length > HISTORY_LIMIT) data.history.pop();
-  _scoreCache[testId] = data;
-  return data;
+const HUMAN_BENCH_ASC = new Set(['reaction', 'aim_trainer']);
+
+// 提交分数到云端
+function saveScore(testId, score) {
+  return GamePlatform.submitScore(GAME_ID, score, { testId });
 }
-async function hydrateScores() {
+
+// 从云端获取某子测试的个人最佳成绩（拉最近 200 条，计算 best）
+async function getBest(testId) {
   try {
     const items = await GamePlatform.getMyScores(GAME_ID, 200);
-    _scoreCache = {};
+    let best = null;
     (items || []).forEach(it => {
-      if (it.meta && it.meta.testId) _mergeItem(it.meta.testId, it.score);
+      if (it.meta && it.meta.testId === testId) {
+        const s = it.score;
+        if (best === null) { best = s; return; }
+        const asc = HUMAN_BENCH_ASC.has(testId);
+        if (asc ? s < best : s > best) best = s;
+      }
     });
-  } catch (e) { _scoreCache = {}; }
-  return _scoreCache;
-}
-function loadScore(testId) {
-  return _scoreCache[testId] || { best: null, history: [] };
-}
-function saveScore(testId, score) {
-  const data = _mergeItem(testId, score);
-  GamePlatform.submitScore(GAME_ID, score, { testId }).catch(() => {});
-  return data;
-}
-function getBest(testId) {
-  return loadScore(testId).best;
+    return best;
+  } catch (e) { return null; }
 }
 
 // ============================================================
@@ -549,13 +541,15 @@ function showTest() {
   $result.style.display = 'none';
 }
 
-function showResultScreen(test, score, isBetter) {
+async function showResultScreen(test, score) {
   $menu.style.display = 'none';
   $testContainer.style.display = 'none';
   $result.style.display = 'flex';
 
   const percentile = getPercentile(test.id, score);
-  const best = getBest(test.id);
+  const best = await getBest(test.id);
+  const asc = HUMAN_BENCH_ASC.has(test.id);
+  const isBetter = best === null || (asc ? score < best : score > best);
 
   $result.innerHTML = `
     <div class="result-emoji">${isBetter ? '🎉' : '📊'}</div>
@@ -563,7 +557,7 @@ function showResultScreen(test, score, isBetter) {
     <div class="result-score-label">${test.resultLabel}</div>
     <div class="result-score">${typeof score === 'number' ? score.toFixed(1) : score}</div>
     ${isBetter ? '<div class="result-best">🎯 新纪录！</div>' : ''}
-    ${best !== null ? '<div class="result-best">历史最佳：' + best + '</div>' : ''}
+    ${best !== null ? '<div class="result-best">历史最佳：' + (typeof best === 'number' ? best.toFixed(1) : best) + ' ' + test.resultUnit + '</div>' : ''}
     <div class="result-percentile">${percentile}</div>
     <div class="result-actions">
       <button class="btn-primary" id="btn-retry">再试一次</button>
@@ -733,8 +727,8 @@ const TESTS = [
         if (round >= rounds) {
           updateDots();
           const avg = totalTime / rounds;
-          const data = saveScore('reaction', avg);
-          showResultScreen(TESTS[0], avg, data.best === avg);
+          saveScore('reaction', avg);
+          showResultScreen(TESTS[0], avg);
         } else {
           updateDots();
           setTimeout(() => {
@@ -850,8 +844,8 @@ const TESTS = [
           hint.textContent = '正确数字：' + currentNumber;
           inputArea.style.display = 'none';
           const score = level - 1;
-          const data = saveScore('number_memory', score);
-          setTimeout(() => showResultScreen(TESTS[1], score, data.best === score), 1500);
+          saveScore('number_memory', score);
+          setTimeout(() => showResultScreen(TESTS[1], score), 1500);
         }
       }
 
@@ -929,8 +923,8 @@ const TESTS = [
           // 用户说是"见过"但实际是新词 → 错
           wordEl.style.color = 'var(--accent)';
           hintEl.textContent = '这是新词！';
-          const data = saveScore('verbal_memory', score);
-          setTimeout(() => showResultScreen(TESTS[2], score, data.best === score), 1000);
+          saveScore('verbal_memory', score);
+          setTimeout(() => showResultScreen(TESTS[2], score), 1000);
         } else {
           score++;
           hintEl.textContent = '✓ 正确！';
@@ -948,8 +942,8 @@ const TESTS = [
         } else {
           wordEl.style.color = 'var(--accent)';
           hintEl.textContent = '这个词已经出现过了！';
-          const data = saveScore('verbal_memory', score);
-          setTimeout(() => showResultScreen(TESTS[2], score, data.best === score), 1000);
+          saveScore('verbal_memory', score);
+          setTimeout(() => showResultScreen(TESTS[2], score), 1000);
         }
       };
 
@@ -1055,8 +1049,8 @@ const TESTS = [
             }
           });
           const score = level - 1;
-          const data = saveScore('visual_memory', score);
-          setTimeout(() => showResultScreen(TESTS[3], score, data.best === score), 1500);
+          saveScore('visual_memory', score);
+          setTimeout(() => showResultScreen(TESTS[3], score), 1500);
         }
       }
 
@@ -1147,8 +1141,8 @@ const TESTS = [
           cells[expected.r * GRID + expected.c].classList.add('correct');
 
           const score = sequence.length - 1;
-          const data = saveScore('sequence_memory', score);
-          setTimeout(() => showResultScreen(TESTS[4], score, data.best === score), 1200);
+          saveScore('sequence_memory', score);
+          setTimeout(() => showResultScreen(TESTS[4], score), 1200);
         }
       }
 
@@ -1254,8 +1248,8 @@ const TESTS = [
         input.disabled = true;
         const elapsedMin = (DURATION - timeLeft) / 60;
         const wpm = elapsedMin > 0 ? Math.round((correctChars / 5) / elapsedMin) : 0;
-        const data = saveScore('typing', wpm);
-        showResultScreen(TESTS[5], wpm, data.best === wpm);
+        saveScore('typing', wpm);
+        showResultScreen(TESTS[5], wpm);
       }
     },
     destroy() {}
@@ -1311,8 +1305,8 @@ const TESTS = [
 
           if (targetsLeft <= 0) {
             const avg = totalTime / TOTAL_TARGETS;
-            const data = saveScore('aim_trainer', avg);
-            showResultScreen(TESTS[6], avg, data.best === avg);
+            saveScore('aim_trainer', avg);
+            showResultScreen(TESTS[6], avg);
           } else {
             setTimeout(spawnTarget, 100);
           }
@@ -1349,20 +1343,16 @@ const TESTS = [
 // ============================================================
 //  渲染主菜单
 // ============================================================
-function renderMenu() {
+async function renderMenu() {
   let html = '';
   TESTS.forEach(test => {
-    const best = getBest(test.id);
-    const bestText = best !== null
-      ? '最佳：' + (typeof best === 'number' ? best.toFixed(1) : best) + ' ' + test.resultUnit
-      : '';
     html += `
       <div class="test-card" data-test="${test.id}">
         <div class="test-card-emoji">${test.emoji}</div>
         <div class="test-card-info">
           <div class="test-card-name">${test.name}</div>
           <div class="test-card-desc">${test.desc}</div>
-          ${bestText ? '<div class="test-card-best">' + bestText + '</div>' : ''}
+          <div class="test-card-best" id="best-${test.id}" style="display:none"></div>
           <div class="test-card-top" id="top-${test.id}" style="display:none"></div>
         </div>
         <div class="test-card-arrow">›</div>
@@ -1380,15 +1370,14 @@ function renderMenu() {
     };
   });
 
-  // 异步拉取各子测试天梯榜首
+  // 异步拉取各子测试个人最佳 + 天梯榜首
   loadAllTops();
+  loadAllBests();
 }
 
 // ============================================================
 //  天梯榜首（展示在各测试卡片上）
 // ============================================================
-const HUMAN_BENCH_ASC = new Set(['reaction', 'aim_trainer']);
-
 function loadAllTops() {
   TESTS.forEach(test => {
     const el = document.getElementById('top-' + test.id);
@@ -1402,6 +1391,19 @@ function loadAllTops() {
       const name = top.nickname || '匿名';
       const score = typeof top.score === 'number' ? top.score.toFixed(1) : top.score;
       el.textContent = '🏆 ' + name + ' · ' + score + ' ' + test.resultUnit;
+      el.style.display = '';
+    }).catch(() => {});
+  });
+}
+
+function loadAllBests() {
+  TESTS.forEach(test => {
+    const el = document.getElementById('best-' + test.id);
+    if (!el) return;
+    getBest(test.id).then(best => {
+      if (best === null) return;
+      const text = '最佳：' + (typeof best === 'number' ? best.toFixed(1) : best) + ' ' + test.resultUnit;
+      el.textContent = text;
       el.style.display = '';
     }).catch(() => {});
   });
@@ -1578,7 +1580,7 @@ document.getElementById('share-close-btn').onclick = () => {
 // ============================================================
 GamePlatform.init(); // 同步处理 ?token= 并写入 cookie（返回 token 字符串，非 Promise）
 GamePlatform.mountGate({ gameId: GAME_ID }).then(() => {
-  hydrateScores().then(() => showMenu());
+  showMenu();
 });
 </script>
   <a href="https://game-list-arv.pages.dev" class="gp-home-btn" title="主页">🏠</a>
