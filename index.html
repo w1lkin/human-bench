@@ -128,6 +128,13 @@ body {
   font-weight: 500;
 }
 
+.test-card-top {
+  font-size: 11px;
+  color: var(--warning);
+  margin-top: 1px;
+  font-weight: 500;
+}
+
 .test-card-arrow {
   color: var(--text-muted);
   font-size: 20px;
@@ -1346,13 +1353,17 @@ function renderMenu() {
   let html = '';
   TESTS.forEach(test => {
     const best = getBest(test.id);
+    const bestText = best !== null
+      ? '最佳：' + (typeof best === 'number' ? best.toFixed(1) : best) + ' ' + test.resultUnit
+      : '';
     html += `
       <div class="test-card" data-test="${test.id}">
         <div class="test-card-emoji">${test.emoji}</div>
         <div class="test-card-info">
           <div class="test-card-name">${test.name}</div>
           <div class="test-card-desc">${test.desc}</div>
-          ${best !== null ? '<div class="test-card-best">最佳：' + (typeof best === 'number' ? best.toFixed(1) : best) + ' ' + test.resultUnit + '</div>' : ''}
+          ${bestText ? '<div class="test-card-best">' + bestText + '</div>' : ''}
+          <div class="test-card-top" id="top-${test.id}" style="display:none"></div>
         </div>
         <div class="test-card-arrow">›</div>
       </div>
@@ -1367,6 +1378,32 @@ function renderMenu() {
       const test = TESTS.find(t => t.id === testId);
       if (test) startTest(test);
     };
+  });
+
+  // 异步拉取各子测试天梯榜首
+  loadAllTops();
+}
+
+// ============================================================
+//  天梯榜首（展示在各测试卡片上）
+// ============================================================
+const HUMAN_BENCH_ASC = new Set(['reaction', 'aim_trainer']);
+
+function loadAllTops() {
+  TESTS.forEach(test => {
+    const el = document.getElementById('top-' + test.id);
+    if (!el) return;
+    // 对 asc 类型取 10 条再反转取第一条（最小值），desc 类型直接取第一条
+    const limit = HUMAN_BENCH_ASC.has(test.id) ? 10 : 1;
+    GamePlatform.getLeaderboard(GAME_ID, limit, null, 'testId', test.id).then(items => {
+      if (!items || items.length === 0) return;
+      const top = HUMAN_BENCH_ASC.has(test.id) ? items[items.length - 1] : items[0];
+      if (!top) return;
+      const name = top.nickname || '匿名';
+      const score = typeof top.score === 'number' ? top.score.toFixed(1) : top.score;
+      el.textContent = '🏆 ' + name + ' · ' + score + ' ' + test.resultUnit;
+      el.style.display = '';
+    }).catch(() => {});
   });
 }
 
