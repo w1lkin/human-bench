@@ -514,7 +514,12 @@ async function getBest(testId) {
     const items = await GamePlatform.getMyScores(GAME_ID, 200);
     let best = null;
     (items || []).forEach(it => {
-      if (it.meta && it.meta.testId === testId) {
+      // meta 在 DB 中是 JSON 字符串，需先解析
+      let meta = it.meta;
+      if (typeof meta === 'string') {
+        try { meta = JSON.parse(meta); } catch (e) { return; }
+      }
+      if (meta && meta.testId === testId) {
         const s = it.score;
         if (best === null) { best = s; return; }
         const asc = HUMAN_BENCH_ASC.has(testId);
