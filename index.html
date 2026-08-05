@@ -453,131 +453,6 @@ body {
 }
 .progress-dot.done { background: var(--success); }
 .progress-dot.current { background: var(--accent); }
-
-/* === 天梯榜页面 === */
-#leaderboard-page {
-  display: none;
-  flex-direction: column;
-}
-.leaderboard-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  width: 100%;
-  margin-bottom: 16px;
-}
-.leaderboard-title {
-  font-size: 20px;
-  font-weight: 700;
-}
-.leaderboard-tabs {
-  display: flex;
-  gap: 6px;
-  overflow-x: auto;
-  padding-bottom: 4px;
-  margin-bottom: 12px;
-  -webkit-overflow-scrolling: touch;
-  scrollbar-width: none;
-}
-.leaderboard-tabs::-webkit-scrollbar { display: none; }
-.leaderboard-tab {
-  flex-shrink: 0;
-  padding: 8px 14px;
-  border-radius: 20px;
-  font-size: 13px;
-  font-weight: 500;
-  cursor: pointer;
-  background: var(--card);
-  color: var(--text-secondary);
-  border: 1px solid rgba(255,255,255,0.06);
-  transition: background 0.2s, color 0.2s;
-  white-space: nowrap;
-}
-.leaderboard-tab.active {
-  background: var(--accent);
-  color: #fff;
-  border-color: var(--accent);
-}
-.leaderboard-list {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
-.leaderboard-item {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  background: var(--card);
-  border-radius: 12px;
-  padding: 12px 14px;
-  border: 1px solid rgba(255,255,255,0.04);
-}
-.leaderboard-rank {
-  width: 28px;
-  height: 28px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 13px;
-  font-weight: 700;
-  flex-shrink: 0;
-  background: var(--primary);
-  color: var(--text-secondary);
-}
-.leaderboard-rank.gold { background: #ffd700; color: #1a1a2e; }
-.leaderboard-rank.silver { background: #c0c0c0; color: #1a1a2e; }
-.leaderboard-rank.bronze { background: #cd7f32; color: #fff; }
-.leaderboard-avatar {
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
-  object-fit: cover;
-  flex-shrink: 0;
-  background: var(--primary);
-}
-.leaderboard-name {
-  flex: 1;
-  font-size: 15px;
-  font-weight: 500;
-  color: var(--text);
-  min-width: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-.leaderboard-score {
-  font-size: 16px;
-  font-weight: 700;
-  color: var(--accent);
-  flex-shrink: 0;
-}
-.leaderboard-empty {
-  text-align: center;
-  color: var(--text-muted);
-  padding: 32px;
-  font-size: 14px;
-}
-
-/* 菜单底部的天梯榜入口 */
-.menu-footer {
-  margin-top: 20px;
-  text-align: center;
-}
-.btn-leaderboard {
-  background: var(--card);
-  color: var(--text);
-  border: 1px solid rgba(233,69,96,0.3);
-  padding: 12px 32px;
-  border-radius: 12px;
-  font-size: 15px;
-  cursor: pointer;
-  transition: background 0.2s, border-color 0.2s;
-}
-.btn-leaderboard:active {
-  background: var(--card-hover);
-  border-color: var(--accent);
-}
 </style>
 </head>
 <body>
@@ -589,7 +464,6 @@ body {
   <div id="menu"></div>
   <div id="test-container"></div>
   <div id="result"></div>
-  <div id="leaderboard-page"></div>
 </div>
 
 <!-- 分享浮层 -->
@@ -659,7 +533,6 @@ function showMenu() {
   $menu.style.display = '';
   $testContainer.style.display = 'none';
   $result.style.display = 'none';
-  document.getElementById('leaderboard-page').style.display = 'none';
   renderMenu();
 }
 
@@ -1485,7 +1358,6 @@ function renderMenu() {
       </div>
     `;
   });
-  html += `<div class="menu-footer"><button class="btn-leaderboard" id="btn-leaderboard-entry">🏆 天梯排行</button></div>`;
   $menu.innerHTML = html;
 
   // 绑定测试卡片点击事件
@@ -1496,88 +1368,6 @@ function renderMenu() {
       if (test) startTest(test);
     };
   });
-
-  // 绑定天梯榜入口
-  document.getElementById('btn-leaderboard-entry').onclick = showLeaderboard;
-}
-
-// ============================================================
-//  天梯榜（按子测试分类）
-// ============================================================
-let _currentLeaderboardTest = null;
-
-function showLeaderboard() {
-  $menu.style.display = 'none';
-  $testContainer.style.display = 'none';
-  $result.style.display = 'none';
-
-  const $page = document.getElementById('leaderboard-page');
-  $page.style.display = 'flex';
-
-  // 默认选中第一个测试
-  if (!_currentLeaderboardTest) _currentLeaderboardTest = TESTS[0].id;
-
-  const test = TESTS.find(t => t.id === _currentLeaderboardTest);
-  const tabsHtml = TESTS.map(t =>
-    `<div class="leaderboard-tab${t.id === _currentLeaderboardTest ? ' active' : ''}" data-lb="${t.id}">${t.emoji} ${t.name}</div>`
-  ).join('');
-
-  $page.innerHTML = `
-    <div class="leaderboard-header">
-      <button class="btn-back" id="lb-back">← 返回</button>
-      <div class="leaderboard-title">🏆 天梯排行</div>
-      <div style="width:60px;"></div>
-    </div>
-    <div class="leaderboard-tabs" id="lb-tabs">${tabsHtml}</div>
-    <div class="leaderboard-list" id="lb-list">
-      <div class="leaderboard-empty">加载中…</div>
-    </div>
-  `;
-
-  document.getElementById('lb-back').onclick = showMenu;
-
-  // 绑定 tab 切换
-  document.querySelectorAll('#lb-tabs .leaderboard-tab').forEach(tab => {
-    tab.onclick = () => {
-      _currentLeaderboardTest = tab.dataset.lb;
-      showLeaderboard(); // 重新渲染
-    };
-  });
-
-  // 加载当前分类的天梯数据
-  loadLeaderboard(test);
-}
-
-async function loadLeaderboard(test) {
-  const listEl = document.getElementById('lb-list');
-  try {
-    const items = await GamePlatform.getLeaderboard(GAME_ID, 20, null, 'testId', test.id);
-    if (!items || items.length === 0) {
-      listEl.innerHTML = '<div class="leaderboard-empty">暂无排行数据，快去挑战吧！</div>';
-      return;
-    }
-    listEl.innerHTML = items.map((it, i) => {
-      const rank = i + 1;
-      let rankClass = '';
-      let rankIcon = rank;
-      if (rank === 1) { rankClass = 'gold'; rankIcon = '🥇'; }
-      else if (rank === 2) { rankClass = 'silver'; rankIcon = '🥈'; }
-      else if (rank === 3) { rankClass = 'bronze'; rankIcon = '🥉'; }
-      const avatar = it.avatar_url || '';
-      const name = it.nickname || '匿名';
-      const score = typeof it.score === 'number' ? it.score.toFixed(1) : it.score;
-      return `
-        <div class="leaderboard-item">
-          <div class="leaderboard-rank ${rankClass}">${rankIcon}</div>
-          ${avatar ? `<img class="leaderboard-avatar" src="${avatar}" alt="" onerror="this.style.display='none'">` : ''}
-          <div class="leaderboard-name">${name}</div>
-          <div class="leaderboard-score">${score} ${test.resultUnit}</div>
-        </div>
-      `;
-    }).join('');
-  } catch (e) {
-    listEl.innerHTML = '<div class="leaderboard-empty">加载失败，请稍后重试</div>';
-  }
 }
 
 // ============================================================
