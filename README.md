@@ -44,7 +44,3 @@ human-bench/
 
 已部署至 Cloudflare Pages：`human-bench.pages.dev`
 
-## 版本
-
-- **v1.0.0** — 初始发布：7 项认知测试、云端战绩、分享卡片
-- **v2.0.0** — 完善项目文档（AGENTS.md / README.md）
