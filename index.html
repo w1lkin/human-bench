@@ -505,13 +505,25 @@ const $shareCardImg = document.getElementById('share-card-img');
 const GAME_ID = 'human-bench';
 const HUMAN_BENCH_ASC = new Set(['reaction', 'aim_trainer']);
 
-// 提交分数到云端
+// 提交分数到云端 + 更新本地最佳缓存
 function saveScore(testId, score) {
+  // 本地即时缓存最佳成绩（离线/未登录也能看到）
+  updateLocalBest(testId, score);
   return GamePlatform.submitScore(GAME_ID, score, { testId });
+}
+
+// 更新本地最佳成绩缓存（按 asc/desc 规则比较）
+function updateLocalBest(testId, score) {
+  const key = 'hb_best_' + testId;
+  const prev = GamePlatform.localCache.get(key);
+  if (prev === null) { GamePlatform.localCache.set(key, score); return; }
+  const asc = HUMAN_BENCH_ASC.has(testId);
+  if (asc ? score < prev : score > prev) GamePlatform.localCache.set(key, score);
 }
 
 // 从云端获取某子测试的个人最佳成绩（拉最近 200 条，计算 best）
 async function getBest(testId) {
+  const key = 'hb_best_' + testId;
   try {
     const items = await GamePlatform.getMyScores(GAME_ID, 200);
     let best = null;
@@ -528,8 +540,9 @@ async function getBest(testId) {
         if (asc ? s < best : s > best) best = s;
       }
     });
+    if (best !== null) GamePlatform.localCache.set(key, best); // 云端成功，回写本地保持一致
     return best;
-  } catch (e) { return null; }
+  } catch (e) { return GamePlatform.localCache.get(key); } // 云端失败，回退本地缓存
 }
 
 // ============================================================
